@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="it">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Just west DB</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap CSS via CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/simple-lightbox/2.10.3/simple-lightbox.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <!-- Web App Manifest -->
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+
+    <!-- Theme Color -->
+    <meta name="theme-color" content="#FFFFFF">
+
+    <!-- Icons -->
+    <link rel="icon" href="{{ url_for('static', filename='incona.jpg') }}" type="image/jpeg">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='incona.jpg') }}" type="image/jpeg">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='incona.jpg') }}">
+    <link rel="apple-touch-icon" sizes="152x152" href="{{ url_for('static', filename='incona.jpg') }}">
+    <link rel="apple-touch-icon" sizes="120x120" href="{{ url_for('static', filename='incona.jpg') }}">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='incona.jpg') }}">
+
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="{{ url_for('index') }}">Wardrobe JW</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('index') }}">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('add_product') }}">Aggiungi Articolo</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<main class="container main-container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+</main>
+
+<!-- Bootstrap JS Bundle via CDN -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Custom script for dropdown z-index fix -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Dropdown z-index fix
+        var dropdowns = document.querySelectorAll('.category-actions-menu .dropdown');
+        dropdowns.forEach(function (dropdown) {
+            dropdown.addEventListener('show.bs.dropdown', function (event) {
+                var categoryCard = event.target.closest('.category-card');
+                if (categoryCard) {
+                    categoryCard.classList.add('menu-open');
+                }
+            });
+
+            dropdown.addEventListener('hide.bs.dropdown', function (event) {
+                var categoryCard = event.target.closest('.category-card');
+                if (categoryCard) {
+                    categoryCard.classList.remove('menu-open');
+                }
+            });
+        });
+
+        // Search suggestions
+        const searchInput = document.querySelector('input[name="q"]');
+        const suggestionsContainer = document.getElementById('search-suggestions');
+
+        if (searchInput && suggestionsContainer) {
+            searchInput.addEventListener('input', function() {
+                const query = this.value;
+
+                if (query.length < 2) {
+                    suggestionsContainer.innerHTML = '';
+                    return;
+                }
+
+                fetch(`/api/search?q=${encodeURIComponent(query)}`)
+                    .then(response => response.json())
+                    .then(suggestions => {
+                        suggestionsContainer.innerHTML = '';
+                        suggestions.forEach(suggestion => {
+                            const suggestionItem = document.createElement('a');
+                            suggestionItem.href = `/?q=${encodeURIComponent(suggestion)}`;
+                            suggestionItem.className = 'list-group-item list-group-item-action';
+                            suggestionItem.textContent = suggestion;
+                            
+                            suggestionItem.addEventListener('click', function(e) {
+                                e.preventDefault();
+                                searchInput.value = this.textContent;
+                                suggestionsContainer.innerHTML = '';
+                                searchInput.closest('form').submit();
+                            });
+
+                            suggestionsContainer.appendChild(suggestionItem);
+                        });
+                    });
+            });
+
+            document.addEventListener('click', function(event) {
+                if (!event.target.closest('.position-relative')) {
+                    suggestionsContainer.innerHTML = '';
+                }
+            });
+        }
+    });
+</script>
+
+</body>
+</html>

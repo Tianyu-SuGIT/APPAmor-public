@@ -1,0 +1,113 @@
+{% extends "layout.html" %}
+
+{% block content %}
+    <h1 class="mb-4">Aggiungi un Nuovo Articolo</h1>
+    <form method="POST" enctype="multipart/form-data" class="card p-4">
+        <div class="mb-3">
+            <label for="name" class="form-label">Nome Articolo</label>
+            <input type="text" class="form-control" id="name" name="name">
+        </div>
+        <div class="mb-3">
+            <label for="category_id" class="form-label">Categoria</label>
+            <select class="form-select" id="category_id" name="category_id" required>
+                <option value="" disabled selected>Seleziona una categoria</option>
+                {% for category in categories %}
+                    <option value="{{ category.id }}">{{ category.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label for="price" class="form-label">Prezzo (&euro;)</label>
+                <input type="number" class="form-control" id="price" name="price" min="0" step="0.01">
+            </div>
+            <div class="col-md-6 mb-3">
+                <label for="consumo" class="form-label">Consumo</label>
+                <input type="text" class="form-control" id="consumo" name="consumo">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label for="tessuto" class="form-label">Tessuto</label>
+                <input type="text" class="form-control" id="tessuto" name="tessuto">
+            </div>
+            <div class="col-md-6 mb-3">
+                <label for="size" class="form-label">Taglia</label>
+                <input type="text" class="form-control" id="size" name="size">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label for="color" class="form-label">Colore</label>
+                <input type="text" class="form-control" id="color" name="color">
+            </div>
+            <div class="col-md-6 mb-3">
+                <label for="accessori" class="form-label">Accessori</label>
+                <input type="text" class="form-control" id="accessori" name="accessori">
+            </div>
+        </div>
+        <div class="mb-3">
+            <label for="description" class="form-label">Descrizione</label>
+            <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Immagini</label>
+            <div class="custom-file-upload">
+                <input class="form-control" type="file" id="images" name="images" multiple style="display: none;">
+                <label for="images" class="btn btn-secondary">Scegli file</label>
+                <span id="file-chosen" class="ms-3 text-muted">Nessun file scelto</span>
+            </div>
+            <div id="image-preview-container" class="mt-2 d-flex flex-wrap"></div>
+        </div>
+        <button type="submit" class="btn btn-primary">Aggiungi Articolo</button>
+    </form>
+
+<script>
+const fileInput = document.getElementById('images');
+const fileChosen = document.getElementById('file-chosen');
+
+fileInput.addEventListener('change', function(event) {
+    // Update the file chosen text
+    if (fileInput.files.length > 1) {
+        fileChosen.textContent = fileInput.files.length + ' files scelti';
+    } else if (fileInput.files.length == 1) {
+        fileChosen.textContent = fileInput.files[0].name;
+    } else {
+        fileChosen.textContent = 'Nessun file scelto';
+    }
+
+    // Handle image previews
+    const previewContainer = document.getElementById('image-preview-container');
+    previewContainer.innerHTML = ''; // Clear previous previews
+    const files = event.target.files;
+
+    if (files.length > 0) {
+        const previewTitle = document.createElement('h6');
+        previewTitle.textContent = 'Anteprima Immagini:';
+        previewTitle.className = 'mt-3 w-100'; // Add w-100 to take full width
+        previewContainer.appendChild(previewTitle);
+    }
+
+    for (const file of files) {
+        if (file.type.startsWith('image/')){
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'p-2';
+                const img = document.createElement('img');
+                img.src = e.target.result;
+                img.style.maxWidth = '100px';
+                img.style.maxHeight = '100px';
+                img.style.margin = '5px';
+                img.style.borderRadius = '5px';
+                img.style.border = '1px solid #ddd';
+                img.style.objectFit = 'cover';
+                wrapper.appendChild(img);
+                previewContainer.appendChild(wrapper);
+            }
+            reader.readAsDataURL(file);
+        }
+    }
+});
+</script>
+{% endblock %}

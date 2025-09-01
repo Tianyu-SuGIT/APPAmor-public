@@ -1,0 +1,85 @@
+{% extends "layout.html" %}
+
+{% block content %}
+    <!-- Search Bar -->
+    <div class="mb-4 position-relative d-flex align-items-center">
+        <div class="count-box me-3">
+            art: <strong>{{ total_products_count }}</strong>
+        </div>
+        <form action="{{ url_for('index') }}" method="GET" class="d-flex flex-grow-1">
+            <input class="form-control me-2" type="search" placeholder="Cerca un articolo..." name="q" value="{{ query or '' }}" autocomplete="off">
+            <button class="btn btn-secondary" type="submit">Cerca</button>
+        </form>
+        <div id="search-suggestions" class="list-group position-absolute w-100" style="z-index: 1050; top: 100%; left: 0;"></div>
+    </div>
+
+    <!-- Search Results -->
+    {% if query %}
+        <h2>Risultati della ricerca per "{{ query }}"</h2>
+        <div class="row row-cols-1 row-cols-md-3 g-4 mb-5">
+            {% for product in products %}
+                <div class="col">
+                    <div class="card h-100 product-card">
+                        <a href="{{ url_for('product', product_id=product.id) }}">
+                            {% if product.image_filenames %}
+                                <img src="{{ cloudinary_url(product.image_filenames.split(',')[0], width=300, height=200, crop='fill') }}" class="card-img-top" alt="{{ product.name }}">
+                            {% else %}
+                                <img src="https://via.placeholder.com/150" class="card-img-top" alt="Immagine non disponibile">
+                            {% endif %}
+                        </a>
+                        <div class="card-body">
+                            <h5 class="card-title">{{ product.name }}</h5>
+                            <p class="card-text">{{ product.price }} €</p>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <div class="col-12">
+                    <p>Nessun articolo trovato.</p>
+                </div>
+            {% endfor %}
+        </div>
+        <hr>
+    {% endif %}
+
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="mb-0">Categorie</h1>
+        <a href="{{ url_for('add_category') }}" class="btn btn-primary">Aggiungi Categoria +</a>
+    </div>
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
+        {% for category in categories %}
+            <div class="col">
+                <div class="card h-100 text-center category-card">
+                    <a href="{{ url_for('category', category_id=category.id) }}" class="text-decoration-none text-dark flex-grow-1 d-flex align-items-center justify-content-center">
+                        <div class="card-body">
+                            <h5 class="card-title mb-0">{{ category.name }}</h5>
+                            <p class="card-text text-muted">{{ category.product_count }} art.</p>
+                        </div>
+                    </a>
+                    <div class="category-actions-menu">
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-light" type="button" id="dropdownMenuButton-{{ category.id }}" data-bs-toggle="dropdown" aria-expanded="false">
+                                &#x22EE;
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton-{{ category.id }}">
+                                <li><a class="dropdown-item" href="{{ url_for('move_category', category_id=category.id, direction='up') }}">Sposta Su</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('move_category', category_id=category.id, direction='down') }}">Sposta Giù</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <form action="{{ url_for('delete_category', category_id=category.id) }}" method="POST" onsubmit="return confirm('Sei sicuro di voler eliminare questa categoria? Tutti i prodotti associati verranno eliminati.');" class="d-inline">
+                                        <button type="submit" class="dropdown-item text-danger">Elimina</button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="col-12">
+                <p>Nessuna categoria trovata. Aggiungine una per iniziare.</p>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}

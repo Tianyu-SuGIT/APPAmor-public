@@ -1,0 +1,64 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="card p-4">
+    <div class="row">
+        <div class="col-md-12 mb-4">
+            <h1 class="mb-4">{{ product.name }}</h1>
+        </div>
+        <div class="col-md-7 gallery">
+            {% if public_ids %}
+                <div id="productCarousel" class="carousel slide" data-bs-ride="carousel">
+                    <div class="carousel-inner">
+                        {% for public_id in public_ids %}
+                        <div class="carousel-item {% if loop.first %}active{% endif %}">
+                            <a href="{{ cloudinary_url(public_id) }}">
+                                <img src="{{ cloudinary_url(public_id, width=800) }}" class="d-block w-100 product-detail-img" alt="Immagine di {{ product.name }}">
+                            </a>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <button class="carousel-control-prev" type="button" data-bs-target="#productCarousel" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Previous</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#productCarousel" data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Next</span>
+                    </button>
+                </div>
+            {% else %}
+                <p class="text-center">Nessuna immagine disponibile per questo articolo.</p>
+                <img src="https://via.placeholder.com/600x400.png?text=No+Image" class="img-fluid rounded">
+            {% endif %}
+        </div>
+        <div class="col-md-5">
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item"><strong>Prezzo:</strong> &euro;{{ "%.2f"|format(product.price) }}</li>
+                <li class="list-group-item"><strong>Consumo:</strong> {{ product.consumo or 'Non specificato' }}</li>
+                <li class="list-group-item"><strong>Tessuto:</strong> {{ product.tessuto or 'Non specificato' }}</li>
+                <li class="list-group-item"><strong>Taglia:</strong> {{ product.size or 'Non specificata' }}</li>
+                <li class="list-group-item"><strong>Colore:</strong> {{ product.color or 'Non specificato' }}</li>
+                <li class="list-group-item"><strong>Accessori:</strong> {{ product.accessori or 'Nessuno' }}</li>
+                <li class="list-group-item"><strong>Descrizione:</strong><br>{{ product.description or 'Nessuna descrizione.' }}</li>
+            </ul>
+            <hr>
+            <div class="d-flex gap-2">
+                <a href="{{ url_for('edit_product', product_id=product.id) }}" class="btn btn-secondary">Modifica Articolo</a>
+                <form action="{{ url_for('delete_product', product_id=product.id) }}" method="POST" onsubmit="return confirm('Sei sicuro di voler eliminare questo articolo?');">
+                    <button type="submit" class="btn btn-danger">Elimina Articolo</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/simple-lightbox/2.10.3/simple-lightbox.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var lightbox = new SimpleLightbox('.gallery a');
+    });
+</script>
+{% endblock %}

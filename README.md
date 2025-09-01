@@ -1,2 +1,2 @@
-# APPAmor-public
-online tool for inventory management
+# APPAmore
+DB_JUST_WEST

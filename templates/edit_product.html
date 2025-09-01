@@ -1,0 +1,55 @@
+{% extends "layout.html" %}
+
+{% block content %}
+    <h1 class="mb-4">Modifica Articolo</h1>
+    <form method="POST" action="{{ url_for('edit_product', product_id=product.id) }}" class="card p-4">
+        <div class="mb-3">
+            <label for="name" class="form-label">Nome Articolo</label>
+            <input type="text" class="form-control" id="name" name="name" value="{{ product.name }}">
+        </div>
+        <div class="mb-3">
+            <label for="category_id" class="form-label">Categoria</label>
+            <select class="form-select" id="category_id" name="category_id" required>
+                <option value="" disabled>Seleziona una categoria</option>
+                {% for category in categories %}
+                    <option value="{{ category.id }}" {% if category.id == product.category_id %}selected{% endif %}>{{ category.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label for="price" class="form-label">Prezzo (&euro;)</label>
+                <input type="number" class="form-control" id="price" name="price" min="0" step="0.01" value="{{ product.price }}">
+            </div>
+            <div class="col-md-6 mb-3">
+                <label for="consumo" class="form-label">Consumo</label>
+                <input type="text" class="form-control" id="consumo" name="consumo" value="{{ product.consumo }}">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label for="tessuto" class="form-label">Tessuto</label>
+                <input type="text" class="form-control" id="tessuto" name="tessuto" value="{{ product.tessuto }}">
+            </div>
+            <div class="col-md-6 mb-3">
+                <label for="size" class="form-label">Taglia</label>
+                <input type="text" class="form-control" id="size" name="size" value="{{ product.size }}">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label for="color" class="form-label">Colore</label>
+                <input type="text" class="form-control" id="color" name="color" value="{{ product.color }}">
+            </div>
+            <div class="col-md-6 mb-3">
+                <label for="accessori" class="form-label">Accessori</label>
+                <input type="text" class="form-control" id="accessori" name="accessori" value="{{ product.accessori }}">
+            </div>
+        </div>
+        <div class="mb-3">
+            <label for="description" class="form-label">Descrizione</label>
+            <textarea class="form-control" id="description" name="description" rows="3">{{ product.description }}</textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Salva Modifiche</button>
+    </form>
+{% endblock %}

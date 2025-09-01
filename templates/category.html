@@ -1,0 +1,65 @@
+{% extends "layout.html" %}
+
+{% block content %}
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="mb-0">Categoria: {{ category.name }}</h1>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="mb-4 d-flex align-items-center">
+        <div class="count-box me-3">
+            art: <strong>{{ category_products_count }}</strong>
+        </div>
+        <form action="{{ url_for('category', category_id=category.id) }}" method="GET" class="d-flex flex-grow-1">
+            <input class="form-control me-2" type="search" placeholder="Cerca in {{ category.name }}..." name="q" value="{{ query or '' }}">
+            <button class="btn btn-secondary" type="submit">Cerca</button>
+        </form>
+    </div>
+
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+        {% for product in products %}
+            <div class="col">
+                <div class="card h-100 product-card">
+                    <a href="{{ url_for('product', product_id=product.id) }}">
+                        {% if product.image_filenames %}
+                            <div id="carousel-{{ product.id }}" class="carousel slide" data-bs-ride="carousel">
+                                <div class="carousel-inner">
+                                    {% for image in product.image_filenames.split(',') %}
+                                    <div class="carousel-item {% if loop.first %}active{% endif %}">
+                                        <img src="{{ cloudinary_url(image, width=400, height=300, crop='fill') }}" class="d-block w-100" alt="{{ product.name }}">
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                <button class="carousel-control-prev" type="button" data-bs-target="#carousel-{{ product.id }}" data-bs-slide="prev">
+                                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                    <span class="visually-hidden">Previous</span>
+                                </button>
+                                <button class="carousel-control-next" type="button" data-bs-target="#carousel-{{ product.id }}" data-bs-slide="next">
+                                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                    <span class="visually-hidden">Next</span>
+                                </button>
+                            </div>
+                        {% else %}
+                            <img src="https://via.placeholder.com/300x200.png?text=No+Image" class="card-img-top" alt="{{ product.name }}">
+                        {% endif %}
+                    </a>
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title">{{ product.name }}</h5>
+                        <p class="card-text">
+                            <strong>Prezzo:</strong> &euro;{{ "%.2f"|format(product.price) }}
+                        </p>
+                        <a href="{{ url_for('product', product_id=product.id) }}" class="btn btn-primary mt-auto">Vedi Dettagli</a>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="col-12">
+                {% if query %}
+                    <p>Nessun articolo trovato per "{{ query }}" in questa categoria.</p>
+                {% else %}
+                    <p>Nessun articolo in questa categoria.</p>
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}

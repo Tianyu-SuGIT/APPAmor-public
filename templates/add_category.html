@@ -1,0 +1,12 @@
+{% extends "layout.html" %}
+
+{% block content %}
+    <h1 class="mb-4">Aggiungi Nuova Categoria</h1>
+    <form method="POST" action="{{ url_for('add_category') }}">
+        <div class="mb-3">
+            <label for="name" class="form-label">Nome Categoria</label>
+            <input type="text" class="form-control" id="name" name="name" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Aggiungi</button>
+    </form>
+{% endblock %}
